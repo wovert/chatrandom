@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import io from 'socket.io-client';
+import moment from 'moment';
 
 class Chat extends Component {
   constructor(){
@@ -8,7 +9,8 @@ class Chat extends Component {
     this.state = {
       username: '',
       message: '',
-      messages: []
+      messages: [],
+      userCount: null
     }
 
     // binding event handlers
@@ -30,6 +32,12 @@ class Chat extends Component {
     // }
   }
 
+  componentDidMount() {
+    this.socket.emit('ADD_USER', {
+      
+    })
+  }
+
   addMessage(data) {
     console.log(data, 'data from addMessage func');
     this.setState({
@@ -42,8 +50,9 @@ class Chat extends Component {
     e.preventDefault();
     debugger;
     this.socket.emit('SEND_MESSAGE', {
-      author: this.state.username,
-      message: this.state.message
+      username: this.state.username,
+      message: this.state.message,
+      timeStamp: new Date()
     });
     this.setState({message: ''});
   }
@@ -51,8 +60,9 @@ class Chat extends Component {
 
   render(){
     const chatMessages = this.state.messages.map(message => {
+      const timestamp = moment(message.timeStamp).format('LT');
       return (
-        <div>{message.author}: {message.message}</div>
+        <div>[{timestamp}]{message.username}: {message.message}</div>
       )
     })
     return (
