@@ -3,7 +3,7 @@ const socket = require('socket.io');
 const app = express();
 const port = 3001;
 
-var userCount = 0;
+// var userCount = 0;
 
 const server = app.listen(port, () => {
   console.log('Server is running on port 3001!');
@@ -15,15 +15,19 @@ app.get('/', (req,res) => {
 
 const io = socket(server);
 
+const updateUserCount = () => {
+  io.emit('connectedUsers', {connectedUsers: Object.keys(io.sockets.sockets)});
+}
+
+
+
 io.on('connection', (socket) => {
   console.log('user has connected');
-  userCount++;  
-  console.log(`This is the socket id: ${socket.id}`);
-  console.log('this is socket ', socket);
+  updateUserCount();
 
   socket.on('disconnect', () => {
     console.log('user has disconnected');
-    userCount--;
+    updateUserCount();
   });
   
   socket.on('SEND_MESSAGE', (data) => {
@@ -33,7 +37,8 @@ io.on('connection', (socket) => {
     console.log('message received');
   });
 
-  socket.on('ADD_USER', () => {
-    console.log('new user has entered.');
-  })
+  // socket.on('ADD_USER', (user) => {
+  //   console.log('new user has entered.');
+  //   console.log('add_user', user);
+  // })
 })

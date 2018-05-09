@@ -23,18 +23,11 @@ class Chat extends Component {
       this.addMessage(message);
     });
 
-    // const addMessage = (data) => {
-    //   console.log(data, 'data from addMessage func');
-    //   this.setState({
-    //     messages: this.state.messages.concat([data]) 
-    //   });
-    //   console.log(`These are the messages: ${this.state.messages}`);
-    // }
-  }
-
-  componentDidMount() {
-    this.socket.emit('ADD_USER', {
-      
+    this.socket.on('connectedUsers', (users) => {
+      console.log(users, 'this is users');
+      console.log('this is the number of connected users: ' + users.connectedUsers.length);
+      debugger;
+      this.setState({ userCount: users.connectedUsers.length });
     })
   }
 
@@ -64,7 +57,8 @@ class Chat extends Component {
       return (
         <div>[{timestamp}]{message.username}: {message.message}</div>
       )
-    })
+    });
+
     return (
       <div className="chat-main">
         
@@ -82,6 +76,13 @@ class Chat extends Component {
             onChange={(e) => this.setState({message: e.target.value})} />
             <br/>
           <button onClick={this.sendMessage}>Send</button>
+          <div className="generic-message">
+            {this.state.userCount > 1 ? (
+              <p>Someone has joined! Go talk to your new online buddy.</p>
+            ):(
+              <p>One is the loneliest number.</p>
+            )}
+          </div>
           <div className="messages">
             {chatMessages}
           </div>
