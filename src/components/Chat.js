@@ -35,7 +35,6 @@ class Chat extends Component {
     this.setState({
       messages: this.state.messages.concat([data]) 
     });
-    console.log(`These are the messages: ${this.state.messages}`);
   }
 
   sendMessage(e) {
@@ -50,10 +49,10 @@ class Chat extends Component {
 
 
   render(){
-    const messageLog = this.state.messages.map(message => {
+    const messageLog = this.state.messages.map((message, index) => {
       const timestamp = moment(message.timeStamp).format('LT');
       return (
-        <div>[{timestamp}]{message.username}: {message.message}</div>
+        <div key={index}>[{timestamp}]{message.username}: {message.message}</div>
       )
     });
 
