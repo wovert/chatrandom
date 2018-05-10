@@ -14,11 +14,6 @@ const updateUserCount = () => {
   io.emit('connectedUsers', {connectedUsers: Object.keys(io.sockets.sockets)});
 }
 
-const delay = (time,fn) => {
-  setTimeout(function(){
-    fn();
-  }, time)
-}
 
 io.on('connection', (socket) => {
   console.log('user has connected');
@@ -32,22 +27,18 @@ io.on('connection', (socket) => {
   socket.on('SEND_MESSAGE', (data) => {
     console.log(`message is ${data.message}`);
     let splitCommands = data.message.split(" ");
-
-    switch(splitCommands[0]){
-      case '/delay':
-        const time = Number(splitCommands[1]);
+    if(splitCommands.length >= 3 && splitCommands[0] === '/delay'){
+      const time = Number(splitCommands[1]);
         splitCommands.splice(0, 2);
         let msg = splitCommands.join(" ");
     
         setTimeout(() => {
           io.emit('RECEIVE_MESSAGE', {username: data.username, message: msg});
         }, time);
-        break;
-      case '/hop':
-        break;
+    } else {
+      io.emit('RECEIVE_MESSAGE', data); //sends message to front-end      
     }
     
-    // io.emit('RECEIVE_MESSAGE', data); //sends message to front-end
     // console.log('message received');
   });
 })
