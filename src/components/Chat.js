@@ -27,7 +27,7 @@ class Chat extends Component {
       console.log(users, 'this is users');
       console.log('this is the number of connected users: ' + users.connectedUsers.length);
       this.setState({ userCount: users.connectedUsers.length });
-    })
+    });
   }
 
   addMessage(data) {
@@ -40,7 +40,7 @@ class Chat extends Component {
   sendMessage(e) {
     e.preventDefault();
     this.socket.emit('SEND_MESSAGE', {
-      username: this.state.username,
+      author: this.state.username,
       message: this.state.message,
       timeStamp: new Date()
     });
@@ -50,11 +50,17 @@ class Chat extends Component {
 
   render(){
     const messageLog = this.state.messages.map((message, index) => {
-      const timestamp = moment(message.timeStamp).format('LT');
+      // const timestamp = moment(message.timeStamp).format('LT');
       return (
-        <div key={index}>[{timestamp}]{message.username}: {message.message}</div>
+        <div key={index}>[{message.timeStamp}]{message.author}: {message.message}</div>
       )
     });
+    let currentUserMsg;
+    if(this.state.userCount === 2){
+      currentUserMsg = <p>{this.state.userCount - 1} other user online</p>
+    } else if(this.state.userCount > 2){
+      currentUserMsg = <p>{this.state.userCount - 1} other users online</p>
+    }
 
     return (
       <div className="chat-main">
@@ -74,11 +80,7 @@ class Chat extends Component {
             <br/>
           <button onClick={this.sendMessage}>Send</button>
           <div className="generic-message">
-            {this.state.userCount > 1 ? (
-              <p>Someone has joined! Go talk to your new online friend.</p>
-            ):(
-              <p>You're the only one here.  Sit tight...</p>
-            )}
+            {currentUserMsg}
           </div>
           <div className="messages">
             {messageLog}
