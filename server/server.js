@@ -7,7 +7,7 @@ const server = app.listen(port, () => {console.log('Server is running on port 30
 
 app.get('/', (req,res) => {
   res.send('<h1>This is the server for Socket IO Chat</h1>');
-})
+});
 
 const io = socket(server);
 
@@ -17,41 +17,39 @@ const updateUserCount = () => {
 
 
 io.on('connection', (socket) => {
-  console.log('user has connected');
   updateUserCount();
 
-  let userCount = Object.keys(io.sockets.sockets).length;
+  const userCount = Object.keys(io.sockets.sockets).length;
 
-  if(userCount > 1){
-    io.emit('RECEIVE_MESSAGE', generateMessage('Admin', 'User has joined.'));    
-  } else {
-    io.emit('RECEIVE_MESSAGE', generateMessage('Admin', 'welcome to the chat app! You\'re the only one here, sit tight and wait for another user to join.'));      
+  socket.emit('receiveMessage', generateMessage('Admin', 'Welcome to the chat app!'));
+
+  if(userCount === 1){
+    socket.emit('receiveMessage', generateMessage('Admin', "You're the only one here.  Please wait for others to join."));
   }
 
-    
+  if(userCount > 1){
+    socket.broadcast.emit('receiveMessage', generateMessage('Admin', 'User has joined.  Say hello!')); //displays only to the user that entered first suggesting to talk to other user
+  }
 
   socket.on('disconnect', () => {
-    console.log('user has disconnected');
     updateUserCount();
-    io.emit('RECEIVE_MESSAGE', generateMessage('Admin', 'User has left.'))
+    io.emit('receiveMessage', generateMessage('Admin', 'User has left.'))
   });
   
-  socket.on('SEND_MESSAGE', (data) => {
-    console.log(`message is ${data.timeStamp}`);
+  
+  socket.on('sendMessage', (data) => {
     let splitCommands = data.message.split(" ");
-    if(splitCommands.length >= 3 && splitCommands[0] === '/delay'){
+    if(splitCommands.length >= 3 && splitCommands[0] === '/delay'){ // '/delay' command logic
       const time = Number(splitCommands[1]);
       splitCommands.splice(0, 2);
       let msg = splitCommands.join(" ");
 
       setTimeout(() => {
-        io.emit('RECEIVE_MESSAGE', generateMessage(data.author, msg));
+        io.emit('receiveMessage', generateMessage(data.author, msg));
       }, time);
       
     } else {
-      io.emit('RECEIVE_MESSAGE', generateMessage(data.author, data.message)); //sends message to front-end      
-    }
-    
-    // console.log('message received');
+      io.emit('receiveMessage', generateMessage(data.author, data.message));           
+    } 
   });
 })

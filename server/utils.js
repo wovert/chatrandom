@@ -7,7 +7,6 @@ var generateMessage = (author, message) => {
     timeStamp: moment(new Date()).format('LT') };
 }
 
-
 module.exports = {
   generateMessage
 }
