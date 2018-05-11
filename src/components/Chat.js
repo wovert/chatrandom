@@ -1,13 +1,11 @@
 import React, {Component} from 'react';
 import io from 'socket.io-client';
-import moment from 'moment';
 
 // |---MATERIAL UI COMPONENTS---|
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import { List, ListItem } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
-import Divider from 'material-ui/Divider';
 
 const PORT = 3001;
 
